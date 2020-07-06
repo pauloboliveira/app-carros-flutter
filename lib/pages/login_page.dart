@@ -1,6 +1,11 @@
+import 'package:app_carros/api/login_api.dart';
+import 'package:app_carros/pages/home_page.dart';
+import 'package:app_carros/util/push.dart';
 import 'package:app_carros/widgets/app_button.dart';
 import 'package:app_carros/widgets/app_text_form.dart';
 import 'package:flutter/material.dart';
+
+import '../usuario.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -47,15 +52,12 @@ class _LoginPageState extends State<LoginPage> {
             SizedBox(
               height: 10,
             ),
-            AppText(
-              'Senha',
-              'Digite a Senha',
-              password: true,
-              controller: tSenha,
-              validator: _validateSenha,
-              keyboardType: TextInputType.number,
-              focusNode: _focusSenha
-            ),
+            AppText('Senha', 'Digite a Senha',
+                password: true,
+                controller: tSenha,
+                validator: _validateSenha,
+                keyboardType: TextInputType.number,
+                focusNode: _focusSenha),
             SizedBox(
               height: 20,
             ),
@@ -66,41 +68,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  _textFormField(
-    labelText,
-    hintText, {
-    bool password = false,
-    controller,
-    FormFieldValidator<String> validator,
-    TextInputType keyboardType,
-    TextInputAction textInputAction,
-    focusNode,
-    nextFocus,
-    ValueChanged<String> onFieldSubmitted,
-  }) {
-    return TextFormField(
-      validator: validator != null
-          ? validator
-          : (text) {
-              if (text.isEmpty) {
-                return "Esse campo é obrigatório";
-              }
-              return null;
-            },
-      controller: controller,
-      obscureText: password,
-      keyboardType: keyboardType,
-      textInputAction: textInputAction,
-      focusNode: focusNode,
-      onFieldSubmitted: onFieldSubmitted,
-      decoration: InputDecoration(
-        labelText: labelText,
-        hintText: hintText,
-      ),
-    );
-  }
-
-  _onClickLogin() {
+  _onClickLogin() async {
     var usuario = tUsuario.text;
     var senha = tSenha.text;
 
@@ -109,7 +77,15 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    print('$usuario $senha');
+    Usuario user = await LoginApi.login(usuario, senha);
+
+    if (user != null) {
+      print('$usuario $senha');
+      push(context, HomePage());
+    }else {
+      print('Login incorreto');
+    }
+
   }
 
   String _validateLogin(String text) {
