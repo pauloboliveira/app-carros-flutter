@@ -1,5 +1,7 @@
 import 'package:app_carros/api/login_api.dart';
 import 'package:app_carros/pages/home_page.dart';
+import 'package:app_carros/util/alert.dart';
+import 'package:app_carros/util/api_response.dart';
 import 'package:app_carros/util/push.dart';
 import 'package:app_carros/widgets/app_button.dart';
 import 'package:app_carros/widgets/app_text_form.dart';
@@ -20,6 +22,8 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
 
   final _focusSenha = FocusNode();
+
+  bool showProgess = false;
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +65,26 @@ class _LoginPageState extends State<LoginPage> {
             SizedBox(
               height: 20,
             ),
-            AppButton('Login', _onClickLogin)
+            showProgess
+                ? AppButton(
+                    _onClickLogin,
+                    Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation(
+                          Colors.white,
+                        ),
+                      ),
+                    ),
+                  )
+                : AppButton(
+                    _onClickLogin,
+                    Text(
+                      'Login',
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
           ],
         ),
       ),
@@ -77,15 +100,28 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    Usuario user = await LoginApi.login(usuario, senha);
+    setState(() {
+      showProgess = true;
+    });
 
-    if (user != null) {
+    ApiResponse response = await LoginApi.login(usuario, senha);
+
+    if (response.ok) {
+      Usuario usuario = response.result;
+
       print('$usuario $senha');
-      push(context, HomePage());
-    }else {
-      print('Login incorreto');
+      push(context, HomePage(), replace: true);
+    } else {
+      alert(context, response.msg);
+
+      setState(() {
+        showProgess = false;
+      });
     }
 
+    setState(() {
+      showProgess = false;
+    });
   }
 
   String _validateLogin(String text) {

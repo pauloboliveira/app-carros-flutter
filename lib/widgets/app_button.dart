@@ -2,20 +2,17 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class AppButton extends StatelessWidget {
-  String text;
   Function onPressed;
+  Widget child;
 
-  AppButton(this.text, this.onPressed);
+  AppButton(this.onPressed, this.child);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 46,
       child: RaisedButton(
-        child: Text(
-          text,
-          style: TextStyle(color: Colors.white, fontSize: 22),
-        ),
+        child: child,
         color: Colors.blue,
         onPressed: onPressed,
       ),
