@@ -1,5 +1,5 @@
-import 'package:app_carros/api/login_api.dart';
-import 'package:app_carros/pages/home_page.dart';
+import 'package:app_carros/login/login_api.dart';
+import 'package:app_carros/carro/home_page.dart';
 import 'package:app_carros/util/alert.dart';
 import 'package:app_carros/util/api_response.dart';
 import 'package:app_carros/util/push.dart';

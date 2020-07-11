@@ -1,4 +1,4 @@
-import 'package:app_carros/pages/login_page.dart';
+import 'package:app_carros/login/login_page.dart';
 import 'package:app_carros/util/push.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +13,7 @@ class DrawerList extends StatelessWidget {
               accountName: Text('Paulo Borges'),
               accountEmail: Text('paulo.oliveira@gmail.com'),
               currentAccountPicture: CircleAvatar(
-                backgroundImage: AssetImage("assets/images/dog1.png"),
+                backgroundImage: AssetImage(""),
               ),
             ),
             ListTile(
