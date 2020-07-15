@@ -1,7 +1,11 @@
 import 'package:app_carros/carro/carro.dart';
-import 'package:app_carros/carro/carro_api.dart';
+import 'package:app_carros/carro/carro_bloc.dart';
+import 'package:app_carros/carro/carro_page.dart';
+import 'package:app_carros/util/push.dart';
+import 'package:app_carros/util/text_error.dart';
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class CarrosListView extends StatefulWidget {
   String tipoCarro;
 
@@ -11,10 +15,19 @@ class CarrosListView extends StatefulWidget {
   _CarrosListViewState createState() => _CarrosListViewState();
 }
 
-class _CarrosListViewState extends State<CarrosListView> with AutomaticKeepAliveClientMixin {
-
+class _CarrosListViewState extends State<CarrosListView>
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
+ 
+
+  final _bloc = CarroBloc();
+
+  @override
+  void initState() {
+    super.initState();
+    _bloc.loadData(widget.tipoCarro);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,21 +36,11 @@ class _CarrosListViewState extends State<CarrosListView> with AutomaticKeepAlive
   }
 
   _body(String tipoCarro) {
-    Future<List<Carro>> futureCarros = CarroApi.listarCarros(tipoCarro);
-
-    return FutureBuilder(
-      future: futureCarros,
+    return StreamBuilder(
+      stream: _bloc.stream,
       builder: (contex, snapshot) {
         if (snapshot.hasError) {
-          return Center(
-            child: Text(
-              'Não foi possível buscar os carros',
-              style: TextStyle(
-                color: Colors.red,
-                fontSize: 22,
-              ),
-            ),
-          );
+          return TextError("Não foi possível buscar os carros");
         }
 
         if (!snapshot.hasData) {
@@ -68,7 +71,8 @@ class _CarrosListViewState extends State<CarrosListView> with AutomaticKeepAlive
                 children: <Widget>[
                   Center(
                     child: Image.network(
-                      carro.urlFoto ?? "https://s3-sa-east-1.amazonaws.com/videos.livetouchdev.com.br/classicos/Chevrolet_Corvette.png",
+                      carro.urlFoto ??
+                          "https://s3-sa-east-1.amazonaws.com/videos.livetouchdev.com.br/classicos/Chevrolet_Corvette.png",
                       width: 250,
                     ),
                   ),
@@ -86,7 +90,7 @@ class _CarrosListViewState extends State<CarrosListView> with AutomaticKeepAlive
                     children: <Widget>[
                       FlatButton(
                         child: const Text('DETALHES'),
-                        onPressed: () {/* ... */},
+                        onPressed: () => _onClickCarro(carro),
                       ),
                       FlatButton(
                         child: const Text('SHARE'),
@@ -102,5 +106,9 @@ class _CarrosListViewState extends State<CarrosListView> with AutomaticKeepAlive
         itemCount: carros.length,
       ),
     );
+  }
+
+  _onClickCarro(carro) {
+    push(context, CarroPage(carro));
   }
 }

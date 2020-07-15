@@ -1,5 +1,6 @@
-import 'package:app_carros/login/login_api.dart';
+import 'dart:async';
 import 'package:app_carros/carro/home_page.dart';
+import 'package:app_carros/login/login_bloc.dart';
 import 'package:app_carros/util/alert.dart';
 import 'package:app_carros/util/api_response.dart';
 import 'package:app_carros/util/push.dart';
@@ -23,7 +24,19 @@ class _LoginPageState extends State<LoginPage> {
 
   final _focusSenha = FocusNode();
 
-  bool showProgess = false;
+  final _bloc = LoginBloc();
+
+  @override
+  void initState() {
+    super.initState();
+
+    Future<Usuario> usuario = Usuario.get();
+    usuario.then((usuarioLogado) {
+      if (usuarioLogado != null) {
+        push(context, HomePage(), replace: true);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,26 +78,22 @@ class _LoginPageState extends State<LoginPage> {
             SizedBox(
               height: 20,
             ),
-            showProgess
-                ? AppButton(
-                    _onClickLogin,
-                    Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation(
-                          Colors.white,
-                        ),
-                      ),
-                    ),
-                  )
-                : AppButton(
-                    _onClickLogin,
-                    Text(
-                      'Login',
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
+            StreamBuilder(
+              stream: _bloc.stream,
+              initialData: false,
+              builder: (context, snapshot) {
+                return AppButton(
+                  _onClickLogin,
+                  Text(
+                    'Login',
+                    style: TextStyle(
+                      color: Colors.white,
                     ),
                   ),
+                  showProgress: snapshot.data,
+                );
+              }
+            ),
           ],
         ),
       ),
@@ -100,11 +109,7 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    setState(() {
-      showProgess = true;
-    });
-
-    ApiResponse response = await LoginApi.login(usuario, senha);
+    ApiResponse response = await _bloc.login(usuario, senha);
 
     if (response.ok) {
       Usuario usuario = response.result;
@@ -112,16 +117,8 @@ class _LoginPageState extends State<LoginPage> {
       print('$usuario $senha');
       push(context, HomePage(), replace: true);
     } else {
-      alert(context, response.msg);
-
-      setState(() {
-        showProgess = false;
-      });
+      alert(context, response.msg);      
     }
-
-    setState(() {
-      showProgess = false;
-    });
   }
 
   String _validateLogin(String text) {
@@ -136,5 +133,11 @@ class _LoginPageState extends State<LoginPage> {
       return "Senha é obrigatória";
     }
     return null;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _bloc.dispose();
   }
 }

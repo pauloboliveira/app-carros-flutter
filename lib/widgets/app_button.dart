@@ -4,18 +4,34 @@ import 'package:flutter/material.dart';
 class AppButton extends StatelessWidget {
   Function onPressed;
   Widget child;
+  bool showProgress;
 
-  AppButton(this.onPressed, this.child);
+  AppButton(this.onPressed, this.child, {this.showProgress = false});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 46,
-      child: RaisedButton(
-        child: child,
-        color: Colors.blue,
-        onPressed: onPressed,
-      ),
-    );
+    if (showProgress) {
+      return Container(
+        height: 46,
+        child: RaisedButton(
+          onPressed: onPressed,
+          color: Colors.blue,
+          child: Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation(Colors.white),
+            ),
+          ),
+        ),
+      );
+    } else {
+      return Container(
+        height: 46,
+        child: RaisedButton(
+          child: child,
+          color: Colors.blue,
+          onPressed: onPressed,
+        ),
+      );
+    }
   }
 }

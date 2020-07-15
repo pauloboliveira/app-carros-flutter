@@ -52,10 +52,18 @@ class Usuario {
   static Future<Usuario> get() async {
     String bodyJson = await Prefs.getString("user.prefs");
 
+    if(bodyJson.isEmpty){
+      return null;
+    }
+
     Map map = json.decode(bodyJson);
 
     Usuario usuario = Usuario.fromJson(map);
 
     return usuario;
+  }
+
+  static void clear() {
+    Prefs.setString("user.prefs", "");
   }
 }
