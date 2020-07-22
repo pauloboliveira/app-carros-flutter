@@ -5,13 +5,17 @@ import 'carro_api.dart';
 
 class CarroBloc extends SimpleBloc<List<Carro>>{
 
-  loadData(tipo) async {
+  Future<List<Carro>> loadData(tipo) async {
     List<Carro> carros = await CarroApi.listarCarros(tipo);
 
     try {
+
       add(carros);
+      return carros;
+
     } catch (e) {
       addError(e);
+      return null;
     }
   }
 }
