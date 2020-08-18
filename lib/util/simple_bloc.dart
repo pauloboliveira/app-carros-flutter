@@ -2,7 +2,7 @@ import 'dart:async';
 
 class SimpleBloc<T>{
   
-  final _streamController = StreamController();
+  final _streamController = StreamController<T>();
 
   get stream => _streamController.stream;
 
